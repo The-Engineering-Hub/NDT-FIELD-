@@ -1,0 +1,112 @@
+﻿@model IEnumerable<NDTField.Web.Models.Building>
+@{
+    ViewData["Title"] = "Building Safety Portal";
+}
+
+<div class="portal-header text-center py-5">
+    <h1 class="display-5 fw-bold">🏗️ NDT Field — Building Safety Portal</h1>
+    <p class="lead text-muted">Search any building to see its structural safety status</p>
+
+    <form method="get" action="/Buildings" class="mt-4">
+        <div class="input-group input-group-lg mx-auto" style="max-width:600px">
+            <input type="text"
+                   name="q"
+                   value="@ViewBag.Query"
+                   class="form-control"
+                   placeholder="Search by building name, location or number..."/>
+            <button class="btn btn-success" type="submit">Search</button>
+        </div>
+    </form>
+</div>
+
+<div class="container mt-4" style="max-width:800px">
+
+    @if (!string.IsNullOrWhiteSpace(ViewBag.Query as string) && !Model.Any())
+    {
+        <div class="alert alert-warning text-center">
+            No buildings found for <strong>@ViewBag.Query</strong>
+        </div>
+    }
+
+    @foreach (var b in Model)
+    {
+        var badgeClass = b.SafetyStatus switch
+        {
+            "Safe"      => "badge-safe",
+            "Dangerous" => "badge-dangerous",
+            _           => "badge-fair"
+        };
+
+        var cardClass = b.SafetyStatus switch
+        {
+            "Safe"      => "border-safe",
+            "Dangerous" => "border-dangerous",
+            _           => "border-fair"
+        };
+
+        <div class="card mb-3 shadow-sm @cardClass">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="card-title fw-bold mb-1">@b.Name</h5>
+                        <p class="text-muted small mb-1">
+                            @b.Location
+                            @if (!string.IsNullOrEmpty(b.BuildingNumber))
+                            {
+                                <span class="ms-2">| @b.BuildingNumber</span>
+                            }
+                        </p>
+                        <p class="text-muted small mb-0">
+                            Tested: @(b.DateOfTest?.ToString("dd MMM yyyy") ?? "—")
+                        </p>
+                    </div>
+                    <div class="text-end">
+                        <span class="status-badge @badgeClass">
+                            @b.SafetyStatus?.ToUpper()
+                        </span>
+                        <div class="mt-1 text-muted small">
+                            Score: <strong>@b.SafetyScore/100</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <hr/>
+
+                <div class="row text-center small">
+                    <div class="col">
+                        <span class="text-success fw-bold">@b.ExcellentCount</span><br/>Excellent
+                    </div>
+                    <div class="col">
+                        <span class="text-primary fw-bold">@b.GoodCount</span><br/>Good
+                    </div>
+                    <div class="col">
+                        <span class="text-warning fw-bold">@b.MediumCount</span><br/>Medium
+                    </div>
+                    <div class="col">
+                        <span class="text-danger fw-bold">@b.DoubtfulCount</span><br/>Doubtful
+                    </div>
+                    <div class="col">
+                        <span class="fw-bold">@b.TotalTests</span><br/>Total
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <a href="/Buildings/Details/@b.Id"
+                       class="btn btn-sm btn-outline-secondary">
+                        View Full Report →
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (!Model.Any() && string.IsNullOrWhiteSpace(ViewBag.Query as string))
+    {
+        <div class="text-center text-muted py-5">
+            <p class="fs-5">No buildings uploaded yet.</p>
+            <a href="/Buildings/Upload" class="btn btn-success">
+                Upload First Report
+            </a>
+        </div>
+    }
+</div>

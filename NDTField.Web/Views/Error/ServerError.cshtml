@@ -1,0 +1,24 @@
+﻿@{
+    ViewData["Title"] = "Something Went Wrong";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="error-page">
+    <div class="error-code">500</div>
+    <div class="error-icon">⚠️</div>
+    <h2 class="error-title">Something Went Wrong</h2>
+    <p class="error-sub">
+        An unexpected error occurred on our end.
+        Please try again or contact the administrator if the problem persists.
+    </p>
+    <div class="d-flex gap-2 justify-content-center flex-wrap">
+        <a asp-controller="Home" asp-action="Index"
+               class="btn btn-success btn-sm px-4">
+            Go Home
+        </a>
+        <a asp-controller="Buildings" asp-action="Upload"
+               class="btn btn-outline-success btn-sm px-4">
+            Try Upload Again
+        </a>
+    </div>
+</div>

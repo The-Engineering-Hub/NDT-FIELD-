@@ -1,0 +1,57 @@
+﻿@{
+    ViewData["Title"] = "Upload Report";
+}
+
+<div class="container mt-5" style="max-width:580px">
+    <h2 class="fw-bold mb-1">Upload NDT Report</h2>
+    <p class="text-muted mb-4">
+        Upload a JSON file exported from NDT Field desktop app
+    </p>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">@ViewBag.Error</div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <form method="post"
+                  enctype="multipart/form-data"
+                  action="/Buildings/Upload">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">
+                        Select JSON File
+                    </label>
+                    <input type="file"
+                           name="jsonFile"
+                           accept=".json"
+                           class="form-control form-control-lg" />
+                    <div class="form-text">
+                        Only .json files exported from NDT Field are accepted
+                    </div>
+                </div>
+
+                <div class="mb-3 p-3 bg-light rounded small text-muted">
+                    <strong>What gets imported:</strong><br />
+                    ✅ Project and building information<br />
+                    ✅ Safety status and score<br />
+                    ✅ Test result breakdown<br />
+                    ✅ Full raw JSON stored for detailed view
+                </div>
+
+                <button type="submit"
+                        class="btn btn-success btn-lg w-100">
+                    Upload Report
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="text-center mt-3">
+        <a href="/Buildings" class="text-muted small">
+            ← Back to search
+        </a>
+    </div>
+</div>

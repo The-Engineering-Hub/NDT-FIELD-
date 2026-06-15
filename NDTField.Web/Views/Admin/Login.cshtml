@@ -1,0 +1,76 @@
+﻿@{
+    ViewData["Title"] = "Admin Login";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex align-items-center justify-content-center"
+     style="min-height:70vh">
+    <div style="width:100%; max-width:400px">
+
+        <div class="text-center mb-4">
+            <div style="font-size:2rem">🔐</div>
+            <h2 class="fw-bold mt-2" style="font-size:1.2rem">
+                Admin Login
+            </h2>
+            <p class="text-muted" style="font-size:0.8rem">
+                Field Labs Administration
+            </p>
+        </div>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger"
+                 style="font-size:0.82rem">
+                @ViewBag.Error
+            </div>
+        }
+
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <form method="post" asp-action="Login"
+                      asp-controller="Admin">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="returnUrl"
+                           value="@ViewBag.ReturnUrl" />
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            Username
+                        </label>
+                        <input type="text"
+                               name="username"
+                               class="form-control"
+                               placeholder="Enter username"
+                               autocomplete="username"
+                               required />
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            Password
+                        </label>
+                        <input type="password"
+                               name="password"
+                               class="form-control"
+                               placeholder="Enter password"
+                               autocomplete="current-password"
+                               required />
+                    </div>
+
+                    <button type="submit"
+                            class="btn btn-success w-100">
+                        Sign In
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="text-center mt-3">
+            <a asp-controller="Home" asp-action="Index"
+                   class="text-muted" style="font-size:0.78rem">
+                ← Back to portal
+            </a>
+        </div>
+
+    </div>
+</div>

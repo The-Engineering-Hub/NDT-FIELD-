@@ -1,0 +1,272 @@
+﻿@model IEnumerable<NDTField.Web.Models.Building>
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    int currentPage = ViewBag.Page;
+    int totalPages = ViewBag.TotalPages;
+}
+
+<!-- Stats -->
+<div class="stats-row mb-4">
+    <div class="stat-card">
+        <div class="stat-icon bg-slate">🏗️</div>
+        <div>
+            <div class="stat-number">@ViewBag.Total</div>
+            <div class="stat-label">Total</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon bg-green">✅</div>
+        <div>
+            <div class="stat-number text-success">@ViewBag.TotalSafe</div>
+            <div class="stat-label">Safe</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon bg-amber">⚠️</div>
+        <div>
+            <div class="stat-number text-warning">@ViewBag.TotalFair</div>
+            <div class="stat-label">Fair</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon bg-red">🚨</div>
+        <div>
+            <div class="stat-number text-danger">@ViewBag.TotalDangerous</div>
+            <div class="stat-label">Dangerous</div>
+        </div>
+    </div>
+</div>
+
+<!-- Search + logout -->
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" asp-action="Dashboard"
+              class="d-flex gap-2 flex-wrap mb-2">
+            <input type="text"
+                   name="q"
+                   value="@ViewBag.Query"
+                   class="form-control form-control-sm flex-grow-1"
+                   placeholder="Search buildings..." />
+            <button type="submit"
+                    class="btn btn-success btn-sm px-3">
+                Search
+            </button>
+            @if (!string.IsNullOrEmpty(ViewBag.Query as string))
+            {
+                <a asp-action="Dashboard"
+                       class="btn btn-outline-secondary btn-sm">
+                    Clear
+                </a>
+            }
+        </form>
+        <div class="text-end">
+            <a asp-action="Logout"
+                   class="btn btn-outline-danger btn-sm">
+                Sign Out
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Desktop table — hidden on mobile -->
+<div class="card mb-3 d-none d-md-block">
+    <div class="card-body p-0">
+        @if (!Model.Any())
+        {
+            <div class="text-center text-muted py-5">
+                No buildings found.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-sm table-hover detail-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Building</th>
+                            <th>Location</th>
+                            <th>Number</th>
+                            <th>Status</th>
+                            <th>Score</th>
+                            <th>Tests</th>
+                            <th>Date</th>
+                            <th>Uploaded</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var b in Model)
+                        {
+                            var badgeClass = b.SafetyStatus switch
+                            {
+                                "Safe" => "badge-safe",
+                                "Dangerous" => "badge-dangerous",
+                                _ => "badge-fair"
+                            };
+                            <tr>
+                                <td class="fw-semibold">
+                                    <a asp-controller="Buildings"
+                                           asp-action="Details"
+                                           asp-route-id="@b.Id"
+                                           class="text-dark text-decoration-none">
+                                        @b.Name
+                                    </a>
+                                </td>
+                                <td class="text-muted">@(b.Location ?? "—")</td>
+                                <td class="text-muted">@(b.BuildingNumber ?? "—")</td>
+                                <td>
+                                    <span class="status-badge @badgeClass">
+                                        @b.SafetyStatus
+                                    </span>
+                                </td>
+                                <td class="fw-semibold">@b.SafetyScore</td>
+                                <td>@b.TotalTests</td>
+                                <td>@(b.DateOfTest?.ToString("dd MMM yy") ?? "—")</td>
+                                <td class="text-muted">
+                                    @b.UploadedAt.ToString("dd MMM yy")
+                                </td>
+                                <td>
+                                    <form method="post"
+                                          asp-action="Delete"
+                                          asp-route-id="@b.Id"
+                                          onsubmit="return confirm('Delete @b.Name? This cannot be undone.')">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden"
+                                               name="returnPage"
+                                               value="@currentPage" />
+                                        <button type="submit"
+                                                class="btn btn-outline-danger btn-sm">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Mobile cards — hidden on desktop -->
+<div class="d-md-none mb-3">
+    @if (!Model.Any())
+    {
+        <div class="text-center text-muted py-5">
+            No buildings found.
+        </div>
+    }
+    else
+    {
+        @foreach (var b in Model)
+        {
+            var badgeClass = b.SafetyStatus switch
+            {
+                "Safe" => "badge-safe",
+                "Dangerous" => "badge-dangerous",
+                _ => "badge-fair"
+            };
+            var borderClass = b.SafetyStatus switch
+            {
+                "Safe" => "border-safe",
+                "Dangerous" => "border-dangerous",
+                _ => "border-fair"
+            };
+
+            <div class="card mb-2 @borderClass">
+                <div class="card-body">
+
+                    <!-- Building name + badge -->
+                    <div class="d-flex justify-content-between
+                        align-items-start mb-2">
+                        <div>
+                            <div class="fw-bold"
+                                 style="font-size:0.88rem">
+                                @b.Name
+                            </div>
+                            <div class="text-muted"
+                                 style="font-size:0.72rem">
+                                @(b.Location ?? "—")
+                                @if (!string.IsNullOrEmpty(b.BuildingNumber))
+                                {
+                                    <span class="ms-1">· @b.BuildingNumber</span>
+                                }
+                            </div>
+                        </div>
+                        <span class="status-badge @badgeClass">
+                            @b.SafetyStatus
+                        </span>
+                    </div>
+
+                    <!-- Stats row -->
+                    <div class="summary-grid mb-3"
+                         style="grid-template-columns:1fr 1fr 1fr">
+                        <div class="summary-item">
+                            <div class="summary-label">Score</div>
+                            <div class="summary-value">
+                                @b.SafetyScore
+                            </div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Tests</div>
+                            <div class="summary-value">
+                                @b.TotalTests
+                            </div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Date</div>
+                            <div class="summary-value"
+                                 style="font-size:0.78rem">
+                                @(b.DateOfTest?.ToString("dd MMM yy") ?? "—")
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="d-flex gap-2">
+                        <a asp-controller="Buildings"
+                               asp-action="Details"
+                               asp-route-id="@b.Id"
+                               class="btn btn-outline-success btn-sm flex-grow-1">
+                            View Report
+                        </a>
+                        <form method="post"
+                              asp-action="Delete"
+                              asp-route-id="@b.Id"
+                              onsubmit="return confirm('Delete @b.Name? This cannot be undone.')">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden"
+                                   name="returnPage"
+                                   value="@currentPage" />
+                            <button type="submit"
+                                    class="btn btn-outline-danger btn-sm">
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<!-- Pagination -->
+@if (totalPages > 1)
+{
+    <div class="d-flex justify-content-center
+        flex-wrap gap-2 mb-4">
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            <a asp-action="Dashboard"
+                   asp-route-page="@i"
+                   asp-route-q="@ViewBag.Query"
+                   class="btn btn-sm @(i == currentPage
+                                                  ? "btn-success"
+                                                  : "btn-outline-secondary")">
+        @i
+    </a>
+}
+</div>
+}

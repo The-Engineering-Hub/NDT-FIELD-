@@ -1,0 +1,125 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Field Labs</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/NDTField.Web.styles.css" asp-append-version="true" />
+</head>
+<body>
+
+    <div class="d-flex" style="min-height:100vh">
+
+        <!-- ── Sidebar ── -->
+        <aside class="sidebar d-flex flex-column" id="sidebar">
+
+            <!-- Brand -->
+            <div class="sidebar-brand">
+                <span class="brand-icon">⬡</span>
+                <div>
+                    <div class="brand-title">Field Labs</div>
+                    <div class="brand-sub">Safety Portal</div>
+                </div>
+            </div>
+
+            <hr class="sidebar-divider" />
+
+            <!-- Nav -->
+            <nav class="sidebar-nav flex-grow-1">
+                <a class="sidebar-btn @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")"
+                       asp-controller="Home" asp-action="Index">
+                    <span class="btn-icon">🏠</span>
+                    <span class="btn-label">Home</span>
+                </a>
+                <a class="sidebar-btn @(ViewContext.RouteData.Values["controller"]?.ToString() == "Buildings" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")"
+                       asp-controller="Buildings" asp-action="Index">
+                    <span class="btn-icon">🔍</span>
+                    <span class="btn-label">Search Buildings</span>
+                </a>
+                <a class="sidebar-btn @(ViewContext.RouteData.Values["action"]?.ToString() == "Upload" ? "active" : "")"
+                       asp-controller="Buildings" asp-action="Upload">
+                    <span class="btn-icon">📤</span>
+                    <span class="btn-label">Upload Report</span>
+                </a>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <a class="sidebar-btn @(ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" ? "active" : "")"
+                           asp-controller="Admin" asp-action="Dashboard">
+                        <span class="btn-icon">⚙️</span>
+                        <span class="btn-label">Admin</span>
+                    </a>
+                }
+                else
+                {
+                    <a class="sidebar-btn @(ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" ? "active" : "")"
+                           asp-controller="Admin" asp-action="Login">
+                        <span class="btn-icon">🔐</span>
+                        <span class="btn-label">Admin Login</span>
+                    </a>
+                }
+            </nav>
+
+            <hr class="sidebar-divider" />
+
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <div class="small">Field Labs v1.0.0</div>
+                <div class="small opacity-50">&copy; 2026</div>
+            </div>
+
+        </aside>
+
+        <!-- ── Overlay for mobile ── -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+        <!-- ── Main content ── -->
+        <div class="main-wrapper flex-grow-1 d-flex flex-column">
+
+            <!-- Top bar -->
+            <header class="topbar d-flex align-items-center justify-content-between px-3 px-md-4">
+                <div class="d-flex align-items-center gap-3">
+                    <!-- Hamburger — visible on mobile only -->
+                    <button class="hamburger d-md-none" onclick="toggleSidebar()" aria-label="Toggle menu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                    <div class="topbar-title">@ViewData["Title"]</div>
+                </div>
+                <div class="topbar-badge">
+                    <span class="dot"></span> Live
+                </div>
+            </header>
+
+            <!-- Page -->
+            <main class="flex-grow-1 p-3 p-md-4">
+                @RenderBody()
+            </main>
+
+            <!-- Footer -->
+            <footer class="page-footer px-4 py-3 text-muted">
+                Field Labs Safety Portal By Gideon Kairu
+            </footer>
+
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+            function toggleSidebar() {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebarOverlay');
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+            }
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
